@@ -1,6 +1,3 @@
-import pandas as pd
-from src.data.loader import load_raw_data
-
 def print_shape(df) -> None:
     print("\n=== SHAPE ===")
     rows, columns = df.shape
@@ -29,3 +26,21 @@ def print_unique_values(df):
         print(f"Number of unique values: {num_unique}")
         print(f"Values: {'Too many unique values to display.' if num_unique > 10 
                 else unique_values }\n")
+
+def print_feature_groups(numeric_cols, categorical_cols, special_cols):
+    print("\n=== NUMERIC FEATURES ===")
+    print(numeric_cols)
+
+    print("\n=== CATEGORICAL FEATURES ===")
+    print(categorical_cols)
+
+    print("\n=== SPECIAL / CODED FEATURES ===")
+    print(special_cols)
+
+def print_numeric_summary(df, numeric_cols, categorical_cols, special_cols):
+    print("\n=== NUMERIC COLUMNS SUMMARY ===")
+    print(df[numeric_cols].describe())
+    print("\n=== CATEGORICAL COLUMNS SUMMARY ===")
+    print(df[categorical_cols].describe())
+    print("\n=== SPECIAL COLUMNS SUMMARY ===")
+    print(df[special_cols].describe())

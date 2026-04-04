@@ -1,0 +1,43 @@
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Outputs
+outputs/figures/*
+outputs/reports/*
+
+# Keep folders
+!outputs/figures/.gitkeep
+!outputs/reports/.gitkeep
+!data/processed/.gitkeep
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# VSCode (ako ga ikad koristiš)
+.vscode/
+
+z.py

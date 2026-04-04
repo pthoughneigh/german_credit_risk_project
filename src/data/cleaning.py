@@ -1,4 +1,5 @@
 import pandas as pd
+from src.config import PROCESSED_DATA_DIR
 
 def drop_useless_columns(df) -> pd.DataFrame:
     """
