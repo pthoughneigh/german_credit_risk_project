@@ -48,7 +48,5 @@ def main():
     for column in CATEGORICAL_COLUMNS + SPECIAL_COLUMNS:
         plot_categorical_by_target(df, column, TARGET_COLUMN)
 
-    print('\n')
-
 if __name__ == "__main__":
     main()
