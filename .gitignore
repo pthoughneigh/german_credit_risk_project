@@ -1,0 +1,45 @@
+# =========================
+# Python cache
+# =========================
+__pycache__/
+*.py[cod]
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+.venv/
+env/
+
+# =========================
+# PyCharm / IDE
+# =========================
+.idea/
+*.iml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Ignore outputs but keep structure
+# =========================
+outputs/figures/*
+outputs/reports/*
+
+!outputs/figures/.gitkeep
+!outputs/reports/.gitkeep
+
+# =========================
+# Ignore processed data but keep structure
+# =========================
+data/processed/*
+
+!data/processed/.gitkeep
+
+# =========================
+# Ignore specific file
+# =========================
+z.py
