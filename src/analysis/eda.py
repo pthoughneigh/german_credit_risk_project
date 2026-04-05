@@ -1,3 +1,8 @@
+# Exploratory Data Analysis #
+import pandas as pd
+from unicodedata import normalize
+
+
 def print_shape(df) -> None:
     print("\n=== SHAPE ===")
     rows, columns = df.shape
@@ -37,10 +42,32 @@ def print_feature_groups(numeric_cols, categorical_cols, special_cols):
     print("\n=== SPECIAL / CODED FEATURES ===")
     print(special_cols)
 
-def print_numeric_summary(df, numeric_cols, categorical_cols, special_cols):
+def print_summary(df, numeric_cols, categorical_cols, special_cols):
     print("\n=== NUMERIC COLUMNS SUMMARY ===")
     print(df[numeric_cols].describe())
     print("\n=== CATEGORICAL COLUMNS SUMMARY ===")
     print(df[categorical_cols].describe())
     print("\n=== SPECIAL COLUMNS SUMMARY ===")
     print(df[special_cols].describe())
+
+def print_numeric_by_target(df, numeric_cols, target_col):
+    print(f"\n=== NUMERIC FEATURES BY {target_col} ===")
+
+    for col in numeric_cols:
+        print(f"\n--- {col} ---")
+
+        for label in df[target_col].unique():
+            subset = df[df[target_col] == label][col]
+
+            print(f"\n{label.upper()}:")
+            print(subset.describe())
+
+def print_categorical_by_target(df, categorical_cols, target_col):
+    for col in categorical_cols:
+        print(f"\n--- {col} vs {target_col} ---")
+
+        print("COUNTS: ")
+        print(pd.crosstab(df[col], df[target_col], dropna=False))
+
+        print("PROPORTIONS: ")
+        print(pd.crosstab(df[col], df[target_col], normalize='index', dropna=False))

@@ -3,7 +3,9 @@ from src.data.cleaning import drop_useless_columns
 from src.visualization.plots import (
     plot_target_distribution,
     plot_histogram,
-    plot_categorical_counts
+    plot_categorical_counts,
+    plot_numeric_by_target,
+    plot_categorical_by_target
 )
 from src.config import (
     NUMERIC_COLUMNS,
@@ -16,8 +18,10 @@ from src.analysis.eda import (
     print_missing_values,
     print_target_distribution,
     print_unique_values,
-    print_numeric_summary,
-    print_feature_groups
+    print_summary,
+    print_feature_groups,
+    print_numeric_by_target,
+    print_categorical_by_target
 )
 
 def main():
@@ -29,13 +33,20 @@ def main():
     print_target_distribution(df)
     print_unique_values(df)
     print_feature_groups(NUMERIC_COLUMNS, CATEGORICAL_COLUMNS, SPECIAL_COLUMNS)
-    print_numeric_summary(df, NUMERIC_COLUMNS, CATEGORICAL_COLUMNS, SPECIAL_COLUMNS)
+    print_summary(df, NUMERIC_COLUMNS, CATEGORICAL_COLUMNS, SPECIAL_COLUMNS)
+
+    print_numeric_by_target(df, NUMERIC_COLUMNS, TARGET_COLUMN)
+    print_categorical_by_target(df, CATEGORICAL_COLUMNS, TARGET_COLUMN)
 
     plot_target_distribution(df)
     for column in NUMERIC_COLUMNS:
         plot_histogram(df, column)
     for column in CATEGORICAL_COLUMNS:
         plot_categorical_counts(df, column)
+    for column in NUMERIC_COLUMNS:
+        plot_numeric_by_target(df, column, TARGET_COLUMN)
+    for column in CATEGORICAL_COLUMNS + SPECIAL_COLUMNS:
+        plot_categorical_by_target(df, column, TARGET_COLUMN)
 
 if __name__ == "__main__":
     main()

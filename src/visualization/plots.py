@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 from scipy.ndimage import rotate
 
 from src.config import (
@@ -38,4 +39,41 @@ def plot_categorical_counts(df, column):
     plt.tight_layout()
 
     plt.savefig(FIGURES_DIR / f'{column.lower().replace(" ", "_")}_distribution.png')
+    plt.close()
+
+def plot_numeric_by_target(df, column, target_col):
+    labels = sorted(df[target_col].dropna().unique())
+    groups = [
+        df[df[target_col] == label][column].dropna()
+        for label in labels
+    ]
+    plt.figure()
+    plt.boxplot(groups, labels=labels)
+    plt.title(f'{column.capitalize()} by {target_col.capitalize()}')
+    plt.xlabel(target_col.capitalize())
+    plt.ylabel(column.capitalize())
+    plt.tight_layout()
+
+    plt.savefig(FIGURES_DIR / f'{column.lower().replace(" ", "_")}_by_target.png')
+    plt.close()
+
+
+def plot_categorical_by_target(df, column, target_col):
+    ct = pd.crosstab(df[column], df[target_col], normalize="index", dropna=False)
+
+    ax = ct.plot(kind="bar", stacked=True)
+
+    ax.set_xlabel(column)
+    ax.set_ylabel("Proportion")
+    ax.set_title(f"{column} vs {target_col} (Proportions)")
+
+    ax.tick_params(axis='x', labelrotation=45)
+    for label in ax.get_xticklabels():
+        label.set_ha('right')
+
+    ax.legend(title=target_col)
+
+    plt.tight_layout()
+
+    plt.savefig(FIGURES_DIR / f'{column.lower().replace(" ", "_")}_by_target.png')
     plt.close()
