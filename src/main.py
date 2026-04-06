@@ -21,7 +21,10 @@ from src.analysis.eda import (
     print_summary,
     print_feature_groups,
     print_numeric_by_target,
-    print_categorical_by_target
+    print_categorical_by_target,
+    print_mean_difference,
+    t_test_numeric,
+    chi_square_test
 )
 
 def main():
@@ -37,6 +40,10 @@ def main():
 
     print_numeric_by_target(df, NUMERIC_COLUMNS, TARGET_COLUMN)
     print_categorical_by_target(df, CATEGORICAL_COLUMNS, TARGET_COLUMN)
+
+    print_mean_difference(df, NUMERIC_COLUMNS, TARGET_COLUMN)
+    t_test_numeric(df, NUMERIC_COLUMNS, TARGET_COLUMN)
+    chi_square_test(df, CATEGORICAL_COLUMNS, TARGET_COLUMN)
 
     plot_target_distribution(df)
     for column in NUMERIC_COLUMNS:

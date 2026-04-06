@@ -1,5 +1,7 @@
 # Exploratory Data Analysis #
 import pandas as pd
+from scipy.stats import ttest_ind
+from scipy.stats import chi2_contingency
 from unicodedata import normalize
 
 
@@ -71,3 +73,54 @@ def print_categorical_by_target(df, categorical_cols, target_col):
 
         print("PROPORTIONS: ")
         print(pd.crosstab(df[col], df[target_col], normalize='index', dropna=False))
+
+def print_mean_difference(df, numeric_cols, target_col):
+    print(f"\n=== Mean difference by {target_col} ===")
+    good_df = df[df[target_col] == 'good']
+    bad_df = df[df[target_col] == 'bad']
+
+    for col in numeric_cols:
+        good_mean = good_df[col].mean()
+        bad_mean = bad_df[col].mean()
+        diff = bad_mean - good_mean
+
+        print(f"--{col.upper()}--:")
+        print(f"good mean: {good_mean:.2f}")
+        print(f"bad mean: {bad_mean:.2f}")
+        print(f"bad - good: {diff:.2f}")
+
+def t_test_numeric(df, numeric_cols, target_col):
+    print("\n======= NUMERICAL COLUMNS T-TEST ======== ")
+
+    for col in numeric_cols:
+        good_values = df[df[target_col] == 'good'][col].dropna()
+        bad_values = df[df[target_col] == 'bad'][col].dropna()
+        t_statistic, p_value = ttest_ind(bad_values, good_values, equal_var=False)
+
+        print(f"--{col.upper()}--:")
+        print(f"t-statistic: {t_statistic:.2f}")
+        print(f"p-value: {p_value:.5f}")
+
+        if p_value < 0.05:
+            print("→ Statistically significant difference")
+        else:
+            print("→ No significant difference")
+
+def chi_square_test(df, categorical_cols, target_col):
+    print("\n======= CATEGORICAL COLUMNS CHI_SQUARE-TEST ======== ")
+    for col in categorical_cols:
+        print(f"--{col.upper()}--:")
+
+        table = pd.crosstab(df[col], df[target_col], dropna=False)
+
+        chi2, p, dof, expected = chi2_contingency(table)
+
+        print(f"chi2: {chi2:.2f}")
+        print(f"p-value: {p:.5f}")
+        print(f"dof: {dof}") # degrees of freedom
+        # print(f"expected: \n{expected}")
+
+        if p < 0.05:
+            print("→ Statistically significant association")
+        else:
+            print("→ No significant association")
