@@ -24,7 +24,8 @@ from src.analysis.eda import (
     print_categorical_by_target,
     print_mean_difference,
     t_test_numeric,
-    chi_square_test
+    chi_square_test,
+    summarize_feature_importance
 )
 
 def main():
@@ -44,6 +45,8 @@ def main():
     print_mean_difference(df, NUMERIC_COLUMNS, TARGET_COLUMN)
     t_test_numeric(df, NUMERIC_COLUMNS, TARGET_COLUMN)
     chi_square_test(df, CATEGORICAL_COLUMNS, TARGET_COLUMN)
+
+    summarize_feature_importance(df, NUMERIC_COLUMNS, CATEGORICAL_COLUMNS, TARGET_COLUMN)
 
     plot_target_distribution(df)
     for column in NUMERIC_COLUMNS:

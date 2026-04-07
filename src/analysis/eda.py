@@ -1,5 +1,6 @@
 # Exploratory Data Analysis #
 import pandas as pd
+from numpy.ma.core import ceil
 from scipy.stats import ttest_ind
 from scipy.stats import chi2_contingency
 from unicodedata import normalize
@@ -124,3 +125,50 @@ def chi_square_test(df, categorical_cols, target_col):
             print("→ Statistically significant association")
         else:
             print("→ No significant association")
+
+def summarize_feature_importance(df, numeric_cols, categorical_cols, target_col):
+    print("\n=== FEATURE IMPORTANCE SUMMARY ===")
+    print("NUMERIC FEATURES:")
+    good_df = df[df[target_col] == "good"]
+    bad_df = df[df[target_col] == "bad"]
+    num_cols_t_statistics = []
+    cat_cols_chi2 = []
+    for col in numeric_cols:
+        good_values = good_df[col].dropna()
+        bad_values = bad_df[col].dropna()
+        t_statistic, p_value = ttest_ind(bad_values, good_values, equal_var=False)
+        num_cols_t_statistics.append((col, t_statistic, p_value))
+    sorted_num_cols_t_statistics = sorted(num_cols_t_statistics, key=lambda x: abs(x[1]), reverse=True)
+
+    top_k = max(1, round(len(sorted_num_cols_t_statistics) * 0.2))
+    mid_k = max(top_k + 1, round(len(sorted_num_cols_t_statistics) * 0.5)) # relative importance within this dataset
+    for i, (col, t_stat, p_val) in enumerate(sorted_num_cols_t_statistics):
+        if i < top_k and p_val < 0.05:
+            strength = "strong"
+        elif i < mid_k and p_val < 0.05:
+            strength = "medium"
+        else:
+            strength = "weak"
+
+        col = col.replace("_", " ").title()
+        print(f"{col} -> {strength} (t={t_stat:.2f}, p={p_val:.4g})")
+
+    print("\nCATEGORICAL FEATURES:")
+    for col in categorical_cols:
+        table = pd.crosstab(df[col], df[target_col], dropna=False)
+        chi2, p_val, dof, expected = chi2_contingency(table)
+        cat_cols_chi2.append((col, chi2, p_val))
+    sorted_cat_cols_chi2 = sorted(cat_cols_chi2, key=lambda x: x[1], reverse=True)
+
+    top_k = max(1, round(len(sorted_cat_cols_chi2) * 0.2))
+    mid_k = max(top_k + 1, round(len(sorted_cat_cols_chi2) * 0.5)) # relative importance within this dataset
+    for i, (col, chi2, p_val) in enumerate(sorted_cat_cols_chi2):
+        if i < top_k and p_val < 0.05:
+            strength = "strong"
+        elif i < mid_k and p_val < 0.05:
+            strength = "medium"
+        else:
+            strength = "weak"
+
+        col = col.replace("_", " ").title()
+        print(f"{col} -> {strength} (chi2={chi2:.2f}, p={p_val:.4g})")
