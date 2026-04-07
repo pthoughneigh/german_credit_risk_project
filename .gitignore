@@ -31,7 +31,7 @@ outputs/reports/*
 
 !outputs/figures/.gitkeep
 !outputs/reports/.gitkeep
-!outputs/reports/.export.py
+!outputs/reports/export.py
 
 # =========================
 # Ignore processed data but keep structure
