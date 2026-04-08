@@ -15,6 +15,7 @@ To explore and model credit risk using a real financial dataset, focusing on:
 - NumPy
 - Pandas
 - Matplotlib
+- Scipy
 
 ## Project Structure
 - `data/raw/` - original dataset

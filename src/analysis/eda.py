@@ -12,6 +12,11 @@ def print_shape(df) -> None:
     rows, columns = df.shape
     print(f"rows: {rows}, columns: {columns}")
 
+def print_categorical_columns_unique_values(df, categorical_columns):
+    print("\n=== CATEGORICAL COLUMNS UNIQUE VALUES ===")
+    for col in categorical_columns:
+        print("\nCategorical Column: " + col)
+        print(df[col].dropna().unique())
 
 def print_missing_values(df) -> None:
     """
@@ -403,6 +408,7 @@ def run_full_eda(df, numeric_cols, categorical_cols, special_cols, target_col="R
     print_missing_values(df)
     print_target_distribution(df, target_col)
     print_unique_values(df)
+    print_categorical_columns_unique_values(df, categorical_cols)
     print_feature_groups(numeric_cols, categorical_cols, special_cols)
     print_summary(df, numeric_cols, categorical_cols, special_cols)
     print_numeric_by_target(df, numeric_cols, target_col)
@@ -430,6 +436,7 @@ def run_selected_eda(
     missing=True,
     target_distribution=True,
     unique_values=True,
+    categorical_columns_unique_values=False,
     feature_groups=True,
     summary=True,
     numeric_by_target=False,
@@ -453,6 +460,9 @@ def run_selected_eda(
 
     if unique_values:
         print_unique_values(df)
+
+    if categorical_columns_unique_values:
+        print_categorical_columns_unique_values(df, categorical_cols)
 
     if feature_groups:
         print_feature_groups(numeric_cols, categorical_cols, special_cols)

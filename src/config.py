@@ -21,3 +21,6 @@ TARGET_COLUMN = "Risk"
 NUMERIC_COLUMNS = ["Age", "Credit amount", "Duration"]
 CATEGORICAL_COLUMNS = ["Sex", "Housing", "Saving accounts", "Checking account", "Purpose"]
 SPECIAL_COLUMNS = ["Job"]
+
+ORDINAL_COLUMNS = ["Saving accounts", "Checking account"]
+NOMINAL_COLUMNS = ["Sex", "Housing", 'Purpose']

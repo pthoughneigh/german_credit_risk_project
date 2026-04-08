@@ -1,6 +1,9 @@
+import pandas as pd
 from src.data.loader import load_raw_data
 from src.data.cleaning import drop_useless_columns
 from outputs.reports.export import save_feature_importance_table
+from src.features.engineering import create_basic_features
+from src.features.preprocessing import prepare_modeling_dataset
 from src.visualization.plots import (
     plot_target_distribution,
     plot_histogram,
@@ -13,7 +16,9 @@ from src.config import (
     CATEGORICAL_COLUMNS,
     SPECIAL_COLUMNS,
     TARGET_COLUMN,
-    REPORTS_DIR
+    REPORTS_DIR,
+    ORDINAL_COLUMNS,
+    NOMINAL_COLUMNS
 )
 from src.analysis.eda import (
     run_selected_eda,
@@ -33,6 +38,7 @@ def run_analysis(df):
         missing=True,
         target_distribution=True,
         unique_values=True,
+        categorical_columns_unique_values=True,
         feature_groups=True,
         summary=True,
         numeric_by_target=False,
@@ -76,9 +82,12 @@ def main():
     df = load_raw_data()
     df = drop_useless_columns(df)
 
-    importance_table = run_analysis(df)
-    save_feature_importance_table(importance_table, REPORTS_DIR / "feature_importance.csv")
-    run_visualizations(df)
+    # importance_table = run_analysis(df)
+    # basic_features_df = create_basic_features(df)
+    print(prepare_modeling_dataset(df, TARGET_COLUMN, ORDINAL_COLUMNS, NOMINAL_COLUMNS, NUMERIC_COLUMNS))
+
+    # save_feature_importance_table(importance_table, REPORTS_DIR / "feature_importance.csv")
+    # run_visualizations(df)
 
 
 
