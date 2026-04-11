@@ -1,34 +1,94 @@
+from typing import Any, Dict, List, Sequence, Tuple
+
 import pandas as pd
-from scipy.stats import ttest_ind, chi2_contingency
+from scipy.stats import chi2_contingency, ttest_ind
+
 
 # =========================
 # BASIC OVERVIEW
 # =========================
-def print_shape(df) -> None:
+def print_shape(df: pd.DataFrame) -> None:
     """
     Print the number of rows and columns in the DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    Returns
+    -------
+    None
+        This function prints the shape of the DataFrame.
     """
     print("\n=== SHAPE ===")
     rows, columns = df.shape
     print(f"rows: {rows}, columns: {columns}")
 
-def print_categorical_columns_unique_values(df, categorical_columns):
+
+def print_categorical_columns_unique_values(
+    df: pd.DataFrame,
+    categorical_columns: Sequence[str]
+) -> None:
+    """
+    Print unique non-null values for each categorical column.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    categorical_columns : Sequence[str]
+        List or sequence of categorical column names.
+
+    Returns
+    -------
+    None
+        This function prints unique values for each categorical column.
+    """
     print("\n=== CATEGORICAL COLUMNS UNIQUE VALUES ===")
     for col in categorical_columns:
-        print("\nCategorical Column: " + col)
+        print(f"\nCategorical Column: {col}")
         print(df[col].dropna().unique())
 
-def print_missing_values(df) -> None:
+
+def print_missing_values(df: pd.DataFrame) -> None:
     """
     Print the number of missing values for each column.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    Returns
+    -------
+    None
+        This function prints the number of missing values per column.
     """
     print("\n=== MISSING VALUES ===")
     print(df.isna().sum())
 
 
-def print_target_distribution(df, target_col="Risk") -> None:
+def print_target_distribution(
+    df: pd.DataFrame,
+    target_col: str = "Risk"
+) -> None:
     """
     Print target value counts and proportions.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    target_col : str, default="Risk"
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints target counts and normalized proportions.
     """
     print(f"\n=== TARGET DISTRIBUTION: {target_col} ===")
 
@@ -42,11 +102,28 @@ def print_target_distribution(df, target_col="Risk") -> None:
     print(proportions)
 
 
-def print_unique_values(df, max_display=10) -> None:
+def print_unique_values(
+    df: pd.DataFrame,
+    max_display: int = 10
+) -> None:
     """
     Print the number of unique values for each column.
 
-    If a column has more than max_display unique values, only a message is shown.
+    If a column has more than `max_display` unique values, only a message
+    is shown instead of printing all values.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    max_display : int, default=10
+        Maximum number of unique values to display for a column.
+
+    Returns
+    -------
+    None
+        This function prints the number of unique values for each column.
     """
     print("\n=== UNIQUE VALUES ===")
 
@@ -64,9 +141,29 @@ def print_unique_values(df, max_display=10) -> None:
         print(f"Values: {values_to_print}\n")
 
 
-def print_feature_groups(numeric_cols, categorical_cols, special_cols) -> None:
+def print_feature_groups(
+    numeric_cols: Sequence[str],
+    categorical_cols: Sequence[str],
+    special_cols: Sequence[str]
+) -> None:
     """
     Print grouped feature lists.
+
+    Parameters
+    ----------
+    numeric_cols : Sequence[str]
+        Names of numeric feature columns.
+
+    categorical_cols : Sequence[str]
+        Names of categorical feature columns.
+
+    special_cols : Sequence[str]
+        Names of special or coded feature columns.
+
+    Returns
+    -------
+    None
+        This function prints feature groups.
     """
     print("\n=== NUMERIC FEATURES ===")
     print(numeric_cols)
@@ -78,25 +175,49 @@ def print_feature_groups(numeric_cols, categorical_cols, special_cols) -> None:
     print(special_cols)
 
 
-def print_summary(df, numeric_cols, categorical_cols, special_cols) -> None:
+def print_summary(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    categorical_cols: Sequence[str],
+    special_cols: Sequence[str]
+) -> None:
     """
     Print descriptive statistics for numeric, categorical, and special columns.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric columns.
+
+    categorical_cols : Sequence[str]
+        Names of categorical columns.
+
+    special_cols : Sequence[str]
+        Names of special or coded columns.
+
+    Returns
+    -------
+    None
+        This function prints summary statistics for the provided column groups.
     """
     print("\n=== NUMERIC COLUMNS SUMMARY ===")
     if numeric_cols:
-        print(df[numeric_cols].describe())
+        print(df[list(numeric_cols)].describe())
     else:
         print("No numeric columns provided.")
 
     print("\n=== CATEGORICAL COLUMNS SUMMARY ===")
     if categorical_cols:
-        print(df[categorical_cols].describe())
+        print(df[list(categorical_cols)].describe())
     else:
         print("No categorical columns provided.")
 
     print("\n=== SPECIAL COLUMNS SUMMARY ===")
     if special_cols:
-        print(df[special_cols].describe())
+        print(df[list(special_cols)].describe())
     else:
         print("No special columns provided.")
 
@@ -104,28 +225,69 @@ def print_summary(df, numeric_cols, categorical_cols, special_cols) -> None:
 # =========================
 # INTERNAL HELPERS
 # =========================
-def _split_target_groups(df, target_col, positive_label="bad", negative_label="good"):
+def _split_target_groups(
+    df: pd.DataFrame,
+    target_col: str,
+    positive_label: str = "bad",
+    negative_label: str = "good"
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Split DataFrame into target-based groups.
+    Split the DataFrame into two target-based groups.
 
-    Returns:
-        good_df, bad_df
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    target_col : str
+        Name of the target column.
+
+    positive_label : str, default="bad"
+        Label representing the positive class.
+
+    negative_label : str, default="good"
+        Label representing the negative class.
+
+    Returns
+    -------
+    tuple[pandas.DataFrame, pandas.DataFrame]
+        A tuple containing:
+        - good_df : rows where target equals `negative_label`
+        - bad_df : rows where target equals `positive_label`
     """
     good_df = df[df[target_col] == negative_label]
     bad_df = df[df[target_col] == positive_label]
     return good_df, bad_df
 
 
-def _compute_numeric_test_results(df, numeric_cols, target_col):
+def _compute_numeric_test_results(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    target_col: str
+) -> List[Dict[str, Any]]:
     """
     Compute Welch's t-test results for numeric columns.
 
-    Returns:
-        List[dict]
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric columns to test.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        A list of dictionaries containing summary statistics and t-test results
+        for each numeric feature.
     """
     good_df, bad_df = _split_target_groups(df, target_col)
 
-    results = []
+    results: List[Dict[str, Any]] = []
     for col in numeric_cols:
         good_values = good_df[col].dropna()
         bad_values = bad_df[col].dropna()
@@ -155,14 +317,32 @@ def _compute_numeric_test_results(df, numeric_cols, target_col):
     return results
 
 
-def _compute_categorical_test_results(df, categorical_cols, target_col):
+def _compute_categorical_test_results(
+    df: pd.DataFrame,
+    categorical_cols: Sequence[str],
+    target_col: str
+) -> List[Dict[str, Any]]:
     """
     Compute chi-square test results for categorical columns.
 
-    Returns:
-        List[dict]
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    categorical_cols : Sequence[str]
+        Names of categorical columns to test.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        A list of dictionaries containing chi-square test results
+        for each categorical feature.
     """
-    results = []
+    results: List[Dict[str, Any]] = []
 
     for col in categorical_cols:
         contingency_table = pd.crosstab(df[col], df[target_col], dropna=False)
@@ -183,13 +363,26 @@ def _compute_categorical_test_results(df, categorical_cols, target_col):
     return results
 
 
-def _assign_importance_strength(results):
+def _assign_importance_strength(
+    results: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     """
     Assign relative importance labels based on rank and statistical significance.
 
     Features in the top 20% with p < 0.05 are labeled 'strong'.
     Features in the next range up to 50% with p < 0.05 are labeled 'medium'.
     All others are labeled 'weak'.
+
+    Parameters
+    ----------
+    results : list[dict[str, Any]]
+        List of result dictionaries already sorted by importance.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        Updated list of result dictionaries with an added
+        'importance_strength' key.
     """
     if not results:
         return results
@@ -213,9 +406,29 @@ def _assign_importance_strength(results):
 # =========================
 # BY TARGET ANALYSIS
 # =========================
-def print_numeric_by_target(df, numeric_cols, target_col) -> None:
+def print_numeric_by_target(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    target_col: str
+) -> None:
     """
     Print descriptive statistics of numeric columns separately for each target class.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric columns.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints descriptive statistics by target class.
     """
     print(f"\n=== NUMERIC FEATURES BY {target_col} ===")
 
@@ -231,9 +444,30 @@ def print_numeric_by_target(df, numeric_cols, target_col) -> None:
             print(subset.describe())
 
 
-def print_categorical_by_target(df, categorical_cols, target_col) -> None:
+def print_categorical_by_target(
+    df: pd.DataFrame,
+    categorical_cols: Sequence[str],
+    target_col: str
+) -> None:
     """
     Print count and proportion tables for categorical columns against the target.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    categorical_cols : Sequence[str]
+        Names of categorical columns.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints count and proportion tables for each categorical
+        feature versus the target.
     """
     print(f"\n=== CATEGORICAL FEATURES BY {target_col} ===")
 
@@ -255,9 +489,30 @@ def print_categorical_by_target(df, categorical_cols, target_col) -> None:
         print(proportions_table)
 
 
-def print_mean_difference(df, numeric_cols, target_col) -> None:
+def print_mean_difference(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    target_col: str
+) -> None:
     """
-    Print mean values for good and bad classes, and their difference, for numeric columns.
+    Print class means and mean differences for numeric columns.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric columns.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints mean values for the good and bad classes and
+        their difference.
     """
     print(f"\n=== MEAN DIFFERENCE BY {target_col} ===")
 
@@ -273,9 +528,29 @@ def print_mean_difference(df, numeric_cols, target_col) -> None:
 # =========================
 # STATISTICAL TESTS
 # =========================
-def t_test_numeric(df, numeric_cols, target_col) -> None:
+def t_test_numeric(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    target_col: str
+) -> None:
     """
     Perform Welch's t-test for numeric columns between target groups.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric columns to test.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints Welch's t-test results for each numeric feature.
     """
     print("\n=== NUMERICAL COLUMNS T-TEST ===")
 
@@ -292,9 +567,29 @@ def t_test_numeric(df, numeric_cols, target_col) -> None:
             print("→ No significant difference")
 
 
-def chi_square_test(df, categorical_cols, target_col) -> None:
+def chi_square_test(
+    df: pd.DataFrame,
+    categorical_cols: Sequence[str],
+    target_col: str
+) -> None:
     """
     Perform chi-square tests for categorical columns against the target.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    categorical_cols : Sequence[str]
+        Names of categorical columns to test.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function prints chi-square test results for each categorical feature.
     """
     print("\n=== CATEGORICAL COLUMNS CHI-SQUARE TEST ===")
 
@@ -314,15 +609,37 @@ def chi_square_test(df, categorical_cols, target_col) -> None:
 # =========================
 # FEATURE IMPORTANCE
 # =========================
-def build_feature_importance_table(df, numeric_cols, categorical_cols, target_col):
+def build_feature_importance_table(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    categorical_cols: Sequence[str],
+    target_col: str
+) -> pd.DataFrame:
     """
-    Build a feature importance summary table using:
-    - Welch's t-test for numeric features
-    - Chi-square test for categorical features
+    Build a feature importance summary table using statistical tests.
 
-    Returns:
-        A pandas DataFrame with feature name, type, test, statistics, p-value,
-        and relative importance strength.
+    Numeric features are evaluated with Welch's t-test.
+    Categorical features are evaluated with the chi-square test.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric feature columns.
+
+    categorical_cols : Sequence[str]
+        Names of categorical feature columns.
+
+    target_col : str
+        Name of the target column.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A DataFrame containing feature name, feature type, test name,
+        summary statistics, p-value, and assigned importance strength.
     """
     numeric_results = _compute_numeric_test_results(df, numeric_cols, target_col)
     categorical_results = _compute_categorical_test_results(df, categorical_cols, target_col)
@@ -367,12 +684,20 @@ def build_feature_importance_table(df, numeric_cols, categorical_cols, target_co
     return feature_importance_table
 
 
-def summarize_feature_importance(table) -> None:
+def summarize_feature_importance(table: pd.DataFrame) -> None:
     """
     Print a human-readable summary of feature importance results.
 
-    Parameters:
-        table: DataFrame returned by build_feature_importance_table()
+    Parameters
+    ----------
+    table : pandas.DataFrame
+        DataFrame returned by `build_feature_importance_table()`.
+
+    Returns
+    -------
+    None
+        This function prints a readable summary of numeric and categorical
+        feature importance results.
     """
     print("\n=== FEATURE IMPORTANCE SUMMARY ===")
 
@@ -400,9 +725,37 @@ def summarize_feature_importance(table) -> None:
 # =========================
 # FULL EDA RUNNERS
 # =========================
-def run_full_eda(df, numeric_cols, categorical_cols, special_cols, target_col="Risk") -> None:
+def run_full_eda(
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    categorical_cols: Sequence[str],
+    special_cols: Sequence[str],
+    target_col: str = "Risk"
+) -> None:
     """
     Run the full EDA pipeline and print all outputs.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric feature columns.
+
+    categorical_cols : Sequence[str]
+        Names of categorical feature columns.
+
+    special_cols : Sequence[str]
+        Names of special or coded columns.
+
+    target_col : str, default="Risk"
+        Name of the target column.
+
+    Returns
+    -------
+    None
+        This function runs all EDA sections and prints the results.
     """
     print_shape(df)
     print_missing_values(df)
@@ -427,27 +780,88 @@ def run_full_eda(df, numeric_cols, categorical_cols, special_cols, target_col="R
 
 
 def run_selected_eda(
-    df,
-    numeric_cols,
-    categorical_cols,
-    special_cols,
-    target_col="Risk",
-    shape=True,
-    missing=True,
-    target_distribution=True,
-    unique_values=True,
-    categorical_columns_unique_values=False,
-    feature_groups=True,
-    summary=True,
-    numeric_by_target=False,
-    categorical_by_target=False,
-    mean_difference=True,
-    t_test=True,
-    chi_square=True,
-    feature_importance=True
+    df: pd.DataFrame,
+    numeric_cols: Sequence[str],
+    categorical_cols: Sequence[str],
+    special_cols: Sequence[str],
+    target_col: str = "Risk",
+    shape: bool = True,
+    missing: bool = True,
+    target_distribution: bool = True,
+    unique_values: bool = True,
+    categorical_columns_unique_values: bool = False,
+    feature_groups: bool = True,
+    summary: bool = True,
+    numeric_by_target: bool = False,
+    categorical_by_target: bool = False,
+    mean_difference: bool = True,
+    t_test: bool = True,
+    chi_square: bool = True,
+    feature_importance: bool = True
 ) -> None:
     """
     Run only selected EDA sections.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input DataFrame.
+
+    numeric_cols : Sequence[str]
+        Names of numeric feature columns.
+
+    categorical_cols : Sequence[str]
+        Names of categorical feature columns.
+
+    special_cols : Sequence[str]
+        Names of special or coded columns.
+
+    target_col : str, default="Risk"
+        Name of the target column.
+
+    shape : bool, default=True
+        Whether to print the dataset shape.
+
+    missing : bool, default=True
+        Whether to print missing value counts.
+
+    target_distribution : bool, default=True
+        Whether to print target distribution.
+
+    unique_values : bool, default=True
+        Whether to print unique values by column.
+
+    categorical_columns_unique_values : bool, default=False
+        Whether to print unique values for categorical columns only.
+
+    feature_groups : bool, default=True
+        Whether to print grouped feature lists.
+
+    summary : bool, default=True
+        Whether to print summary statistics.
+
+    numeric_by_target : bool, default=False
+        Whether to print numeric summaries by target class.
+
+    categorical_by_target : bool, default=False
+        Whether to print categorical summaries by target class.
+
+    mean_difference : bool, default=True
+        Whether to print mean differences for numeric columns.
+
+    t_test : bool, default=True
+        Whether to run Welch's t-tests for numeric columns.
+
+    chi_square : bool, default=True
+        Whether to run chi-square tests for categorical columns.
+
+    feature_importance : bool, default=True
+        Whether to build and summarize the feature importance table.
+
+    Returns
+    -------
+    None
+        This function runs the selected EDA sections and prints the results.
     """
     if shape:
         print_shape(df)
