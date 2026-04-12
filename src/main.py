@@ -1,6 +1,8 @@
 import pandas as pd
+import numpy as np
 from src.data.loader import load_raw_data
 from src.data.cleaning import drop_useless_columns
+from src.models.functions import train_logistic_regression
 from outputs.reports.export import save_feature_importance_table
 from src.features.engineering import create_basic_features
 from src.features.preprocessing import prepare_modeling_dataset
@@ -90,27 +92,28 @@ def main():
     df = create_basic_features(df)
 
     # importance_table = run_analysis(df)
-    # basic_features_df = create_basic_features(df)
 
     # Processed data for model
     df_prepared = prepare_modeling_dataset(df, TARGET_COLUMN, ORDINAL_COLUMNS, NOMINAL_COLUMNS, NUMERIC_COLUMNS)
+
     # Splitting data for model
     X, y = split_features_target(df_prepared, TARGET_COLUMN)
-    pd.set_option("display.max_rows", 1000)
-    pd.set_option("display.max_columns", 1000)
 
     # Splitting data into train and test
     X_train, X_test, y_train, y_test = train_test_split_stratified_custom(X, y)
-    print(X_train.shape)
-    print(X_test.shape)
-    print(y_train.shape)
-    print(y_test.shape)
 
-    print(y_train.value_counts(normalize=True))
-    print(y_test.value_counts(normalize=True))
+    # Train logistic regression
+    weights, bias, losses = train_logistic_regression(X_train, y_train)
+    print(losses[:5])
+    print(losses[-5:])
+    print(weights)
+    print(weights.shape)
+    print(bias)
+    print(type(bias))
 
     # save_feature_importance_table(importance_table, REPORTS_DIR / "feature_importance.csv")
     # run_visualizations(df)
+
 
 
 if __name__ == "__main__":
