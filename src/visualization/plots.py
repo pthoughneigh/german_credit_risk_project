@@ -1,10 +1,14 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
+
 from scipy.ndimage import rotate
 
 from src.config import (
     FIGURES_DIR
 )
+from src.evaluation.roc_auc import compute_roc_points
+
 
 def plot_target_distribution(df, target_col='Risk'):
     counts = df[target_col].value_counts()
@@ -77,3 +81,32 @@ def plot_categorical_by_target(df, column, target_col):
 
     plt.savefig(FIGURES_DIR / f'{column.lower().replace(" ", "_")}_by_target.png')
     plt.close()
+
+def plot_roc_curve(fpr_list, tpr_list, auc=None, filename="roc_curve.png"):
+    fig, ax = plt.subplots()
+
+    # ROC curve
+    ax.plot(fpr_list, tpr_list, label="ROC Curve")
+
+    # Diagonal (random model)
+    ax.plot([0, 1], [0, 1], linestyle="--", label="Random Model")
+
+    # Labels
+    ax.set_title("ROC Curve")
+    ax.set_xlabel("False Positive Rate (FPR)")
+    ax.set_ylabel("True Positive Rate (TPR)")
+
+    # AUC in Legend
+    if auc is not None:
+        ax.legend(title=f"AUC = {auc:.4f}")
+    else:
+        ax.legend()
+
+    # Grid
+    ax.grid(True)
+
+    # Save
+    output_path = os.path.join(FIGURES_DIR, filename)
+    plt.savefig(output_path)
+
+    plt.close(fig)

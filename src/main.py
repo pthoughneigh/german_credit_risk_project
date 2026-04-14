@@ -3,13 +3,16 @@ import numpy as np
 
 from src.data.loader import load_raw_data
 from src.data.cleaning import drop_useless_columns
-from src.models.functions import (
+from src.evaluation.roc_auc import compute_roc_points, compute_auc
+from src.models.logistic_regression import (
     train_logistic_regression,
-    predict,
+    predict, predict_proba,
+)
+from src.evaluation.metrics import (
     compute_accuracy,
     compute_confusion_matrix,
     compute_precision,
-    compute_recall,
+    compute_recall, compute_f1_score,
 )
 from outputs.reports.export import save_feature_importance_table
 from src.features.engineering import create_basic_features
@@ -28,6 +31,7 @@ from src.visualization.plots import (
     plot_categorical_counts,
     plot_numeric_by_target,
     plot_categorical_by_target,
+    plot_roc_curve,
 )
 from src.config import (
     NUMERIC_COLUMNS,
@@ -90,14 +94,11 @@ def run_visualizations(df: pd.DataFrame) -> None:
     Generate project visualizations for the raw dataset.
     """
     plot_target_distribution(df, TARGET_COLUMN)
-
     for column in NUMERIC_COLUMNS:
         plot_histogram(df, column)
         plot_numeric_by_target(df, column, TARGET_COLUMN)
-
     for column in CATEGORICAL_COLUMNS:
         plot_categorical_counts(df, column)
-
     for column in CATEGORICAL_COLUMNS + SPECIAL_COLUMNS:
         plot_categorical_by_target(df, column, TARGET_COLUMN)
 
@@ -135,6 +136,7 @@ def evaluate_model(
     confusion = compute_confusion_matrix(y, y_pred)
     precision = compute_precision(y, y_pred)
     recall = compute_recall(y, y_pred)
+    f1 = compute_f1_score(y, y_pred)
 
     print(f"\n=== {dataset_name.upper()} METRICS | threshold={threshold} ===")
     print("Predicted values:")
@@ -150,6 +152,7 @@ def evaluate_model(
     print("\nPrecision and recall:")
     print(f"Precision: {precision}")
     print(f"Recall:    {recall}")
+    print(f"F1 score: {f1}")
 
 
 def main() -> None:
@@ -252,6 +255,14 @@ def main() -> None:
         threshold=0.3,
         dataset_name="test",
     )
+
+    # ROC plot
+    # y_scores_test = predict_proba(X_test.to_numpy(), weights, bias)
+
+    # fpr, tpr = compute_roc_points(y_test.to_numpy(), y_scores_test)
+    # auc = compute_auc(y_test.to_numpy(), y_scores_test)
+
+    # plot_roc_curve(fpr, tpr, auc)
 
     # Optional visualizations
     # run_visualizations(df)
